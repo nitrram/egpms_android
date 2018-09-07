@@ -1,0 +1,3 @@
+[submodule "app/src/main/cpp/egctl"]
+	path = app/src/main/cpp/egctl
+	url = https://github.com/unterwulf/egctl.git
