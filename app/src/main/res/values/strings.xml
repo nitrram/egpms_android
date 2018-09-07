@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">EGPMS</string>
+    <string name="btn_1">1</string>
+    <string name="btn_2">2</string>
+    <string name="btn_3">3</string>
+    <string name="btn_4">4</string>
 </resources>

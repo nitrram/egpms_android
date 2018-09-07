@@ -4,12 +4,14 @@
 
 #include <string>
 
-#define PACKAGE_PATH "lol/wtf/egpms/"
+#define PACKAGE_PATH "egpms/lol/wtf/egpms/"
 
 #define APP_ACTION_LEFT 0x00
 #define APP_ACTION_ON 0x01
 #define APP_ACTION_OFF 0x02
 #define APP_ACTION_TOGGLE 0x04
+
+#define LOG_TAG "native-lib"
 
 
 // TODO Config will be created based upon app's input
@@ -26,14 +28,12 @@ jint mm_getStatus(
     int sock;
     Session sess;
 
+
     Config conf = createDummyConfig();
-
     sock = create_socket(&conf.addr);
-    establish_connection(sock);
+        establish_connection(sock);
     sess = authorize(sock, conf.key);
-
     Status stat = recv_status(sock, sess, conf.proto);
-
 
     jint result = convertState(stat);
     close_session(sock);
@@ -57,12 +57,14 @@ jint mm_setState(
     sess = authorize(sock, conf.key);
 
     Status stat = recv_status(sock, sess, conf.proto);
-    Actions actions {ACTION_INVALID,ACTION_INVALID,ACTION_INVALID,ACTION_INVALID};
+    Actions actions {ACTION_LEFT,ACTION_LEFT,ACTION_LEFT,ACTION_LEFT};
 
     for (size_t i = 0; i < SOCKET_COUNT; i++) {
         Action action = commandToAction(abcd, i);
-        if (action == ACTION_INVALID)
-            fatal("Invalid action for socket %zu: %s", i+1, abcd >> (i*8));
+        if (action == ACTION_INVALID) {
+            LOGE("invalid action for socket %zu %d", i + 1, abcd);
+            return 0;
+        }
 
         actions.socket[i] = action;
     }
@@ -83,7 +85,7 @@ jint mm_setState(
 
 static JNINativeMethod method_table[] = {
         { "getStatus", "()I", reinterpret_cast<void*>(&mm_getStatus)},
-        { "setStatus", "(I)I", reinterpret_cast<void*>(&mm_getStatus)}
+        { "setState", "(I)I", reinterpret_cast<void*>(&mm_setState)}
 };
 
 jint JNI_OnLoad(JavaVM *vm, void * /* reserved */) {
@@ -95,14 +97,22 @@ jint JNI_OnLoad(JavaVM *vm, void * /* reserved */) {
 
 /********************************** private utils */
 Config createDummyConfig() {
-    char *line = const_cast<char*>("egpms_local	   pms21    192.168.1.233    8000    pikachu");
+    std::string s = "\tpms21\t192.168.1.23\t8000\tpikachu";
+
+    char *line = new char[s.size() + 1];
+    std::copy(s.begin(), s.end(), line);
+    line[s.size()] = '\0';
 
     Config conf;
+
     conf.proto = consume_protocol(&line);
     conf.addr.sin_addr.s_addr = consume_ip_address(&line);
     conf.addr.sin_port = consume_tcp_port(&line);
     conf.key = consume_key(&line);
     conf.addr.sin_family = AF_INET;
+
+    delete line;
+
     return conf;
 }
 
