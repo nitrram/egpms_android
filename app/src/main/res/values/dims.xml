@@ -2,4 +2,8 @@
 <resources>
     <dimen name="btn_size">80dp</dimen>
     <dimen name="btn_text_size">30sp</dimen>
+
+    <dimen name="act_margin">16dp</dimen>
+    <dimen name="drawer_title_space">5dp</dimen>
+    <dimen name="drawer_header_height">176dp</dimen>
 </resources>

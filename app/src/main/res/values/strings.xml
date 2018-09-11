@@ -4,4 +4,10 @@
     <string name="btn_2">2</string>
     <string name="btn_3">3</string>
     <string name="btn_4">4</string>
+
+    <string name="drawer_header_title">.egtab</string>
+
+    <string name="drawer_bg_description">background</string>
+    <string name="action_add_config">new egtab record</string>
+
 </resources>
