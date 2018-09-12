@@ -8,43 +8,9 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-    <LinearLayout
+    <include layout="@layout/bar_main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center">
-
-        <Switch
-            android:id="@+id/btn_sock_one"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="25dp"
-            android:text="@string/btn_1"/>
-
-        <Switch
-            android:id="@+id/btn_sock_two"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="25dp"
-            android:text="@string/btn_2"/>
-
-        <Switch
-            android:id="@+id/btn_sock_three"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="25dp"
-            android:text="@string/btn_3"/>
-
-        <Switch
-            android:id="@+id/btn_sock_four"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="25dp"
-            android:text="@string/btn_4"/>
-
-
-
-    </LinearLayout>
+        android:layout_height="match_parent"/>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"

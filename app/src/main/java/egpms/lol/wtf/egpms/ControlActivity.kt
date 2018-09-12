@@ -3,10 +3,13 @@ package egpms.lol.wtf.egpms
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.CompoundButton
 import kotlinx.android.synthetic.main.activity_control.*
+import kotlinx.android.synthetic.main.bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
 
 class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -16,6 +19,7 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         when (item.itemId) {
             R.id.nav_add -> {
                 // Handle the camera action
+
             }
         }
 
@@ -26,7 +30,7 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_control)
-
+        setSupportActionBar(toolbar)
         val i = getStatus()
 
         updateSwitches(i)
@@ -36,6 +40,22 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         btn_sock_two.setOnCheckedChangeListener{v,b -> handleClick(v,b) }
         btn_sock_three.setOnCheckedChangeListener{v,b -> handleClick(v,b) }
         btn_sock_four.setOnCheckedChangeListener{v,b -> handleClick(v,b) }
+
+
+         val toggle = ActionBarDrawerToggle(
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        nav_view.setNavigationItemSelectedListener(this)
+    }
+
+    override fun onBackPressed() {
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            drawer_layout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
     }
 
     fun updateSwitches(i: Int) {

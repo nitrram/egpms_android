@@ -10,4 +10,7 @@
     <string name="drawer_bg_description">background</string>
     <string name="action_add_config">new egtab record</string>
 
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
 </resources>
