@@ -17,6 +17,7 @@
     <string name="edit_label_proto">proto</string>
     <string name="edit_label_ip">ip</string>
     <string name="edit_label_port">port</string>
+    <string name="edit_label_pass">pass</string>
     <string name="edit_hint_name">alias</string>
 
 

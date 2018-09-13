@@ -5,10 +5,10 @@ import android.os.Parcelable
 
 data class Profile(
         val name: String,
-        val proto: EProtocol,
-        val ip: Int,
-        val port: Int,
-        val pass:String
+        var proto: EProtocol,
+        var ip: Int,
+        var port: Int,
+        var pass:String
 ) : Parcelable {
 
     constructor(parcel: Parcel) : this(
