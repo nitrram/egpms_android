@@ -13,4 +13,11 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <string name="edit_label_name">name</string>
+    <string name="edit_label_proto">proto</string>
+    <string name="edit_label_ip">ip</string>
+    <string name="edit_label_port">port</string>
+    <string name="edit_hint_name">alias</string>
+
+
 </resources>
