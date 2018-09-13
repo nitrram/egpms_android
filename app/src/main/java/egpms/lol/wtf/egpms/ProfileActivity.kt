@@ -9,6 +9,7 @@ import egpms.lol.wtf.egpms.data.EAction
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import egpms.lol.wtf.egpms.data.EProtocol
 import egpms.lol.wtf.egpms.data.Profile
 
 class ProfileActivity : AppCompatActivity() {
@@ -29,7 +30,12 @@ class ProfileActivity : AppCompatActivity() {
         val gson = Gson()
 
         val arr = prefs!!.getString(PROFILES, "")
-        //val profiles = gson.fromJson(arr, ArrayList<Profile>::class.java)
+        val profiles = gson.fromJson(arr, ArrayList::class.java)
+
+
+        val ip: Int = 0
+
+        profiles!!.append(Profile("ll_ll", EProtocol.PMS21, ip, 5000, "athlon"))
 
         val editor = prefs!!.edit()
         //editor.putString(PROFILES, gson.toJson(arr))

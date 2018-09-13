@@ -97,7 +97,8 @@ jint JNI_OnLoad(JavaVM *vm, void * /* reserved */) {
 
 /********************************** private utils */
 Config createDummyConfig() {
-    std::string s = "\tpms21\t192.168.1.24\t8000\tpikach";
+    //std::string s = "\tpms21\t192.168.1.24\t8000\tpikach";
+    std::string s = "\tpms21\t176.107.123.100\t5000\tathlon";
 
     char *line = new char[s.size() + 1];
     std::copy(s.begin(), s.end(), line);
