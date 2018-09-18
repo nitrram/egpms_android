@@ -10,6 +10,7 @@ import android.widget.CompoundButton
 import kotlinx.android.synthetic.main.activity_control.*
 import kotlinx.android.synthetic.main.bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.coroutines.experimental.async
 
 class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -31,10 +32,11 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_control)
         setSupportActionBar(toolbar)
-        val i = getStatus()
 
-        updateSwitches(i)
-
+        //initConfig("\tpms21\t176.107.123.100\t5000\tathlon")
+        initConfig("\tpms21\t192.168.1.243\t5000\tathlon\t")
+        disableBtns()
+        async { callGetState() }
 
         btn_sock_one.setOnCheckedChangeListener {v,b -> handleClick(v,b) }
         btn_sock_two.setOnCheckedChangeListener{v,b -> handleClick(v,b) }
@@ -88,14 +90,36 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
             R.id.btn_sock_four -> i= i shl 24
         }
 
+        disableBtns()
+        async { callSetState(i) }
+    }
+
+    suspend fun callGetState() {
+        val res = getStatus()
+        onStatusRecv(res)
+    }
+
+    suspend fun callSetState(i: Int) {
         val res = setState(i)
-        updateSwitches(res)
+        onStatusRecv(res)
+    }
+    
+    fun disableBtns() {
+       control_panel.isEnabled = false
+    }
+
+    fun onStatusRecv(value: Int) {
+        control_panel.isEnabled = true
+
+        updateSwitches(value)
     }
 
 
+    external fun initConfig(s: String)
+
     external fun getStatus(): Int
 
-    external fun setState(abcd: Int): Int
+    external fun setState(abcd: Int) : Int
 
     companion object {
 

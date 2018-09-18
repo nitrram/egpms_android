@@ -10,6 +10,7 @@
     tools:showIn="@layout/bar_main">
 
     <LinearLayout
+        android:id="@+id/control_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
