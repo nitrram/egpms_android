@@ -11,4 +11,6 @@
     <dimen name="edit_item_marginEnd">48dp</dimen>
     <dimen name="edit_item_marginTop">25dp</dimen>
     <dimen name="edit_item_marginBottom">16dp</dimen>
+
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

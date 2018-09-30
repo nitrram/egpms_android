@@ -2,33 +2,50 @@ package egpms.lol.wtf.egpms
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import egpms.lol.wtf.egpms.data.EAction
-
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import egpms.lol.wtf.egpms.data.EProtocol
-import egpms.lol.wtf.egpms.data.Profile
+import egpms.lol.wtf.egpms.data.Preferences
 import kotlinx.android.synthetic.main.activity_profile.*
 
-class ProfileActivity : AppCompatActivity() {
+class ProfileActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
-    val PREFS_FILENAME = "egpms.lol.wtf.egpms.prefs"
-    val PROFILES = "profiles"
-    var prefs: SharedPreferences? = null
+
+    lateinit var prefs: Preferences
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        prefs = this.getSharedPreferences(PREFS_FILENAME, 0)
+        edit_proto!!.onItemSelectedListener = this
+
+        val aa = ArrayAdapter(this, android.R.layout.simple_spinner_item, EProtocol.values())
+        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        edit_proto!!.adapter = aa
+
+        prefs = Preferences(this)
     }
 
-    inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object: TypeToken<T>() {}.type)
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
 
+        if(intent == null) return
+
+        if(intent!!.hasExtra(INTENT_PROFILE)) {
+            val pp = prefs.get(intent!!.getStringExtra(INTENT_PROFILE))
+            edit_name.setText(pp?.name)
+            edit_address.setText(ip2str(pp?.ip))
+            //edit_proto.set
+
+        }
+    }
+
+    /*
     fun save() {
 
         val arr = prefs!!.getString(PROFILES, "")
@@ -83,6 +100,33 @@ class ProfileActivity : AppCompatActivity() {
 //     String json = gson.toJson(tasks); //tasks is an ArrayList instance variable
 //     prefsEditor.putString("currentTasks", json);
 //     prefsEditor.commit();
+    }
+*/
+
+
+    override fun onNothingSelected(p0: AdapterView<*>?) {
+
+    }
+
+    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+
+    }
+
+    fun ip2str(ip: Int?) : String {
+
+        var ipStr = ""
+
+        if(ip == null || ip == 0) {
+            return ipStr
+        }
+
+        for(i in 0..3) {
+            val num = (ip!! shr 8*i) and 0xff
+            ipStr += num.toString()
+            if(i != 3) ipStr += "."
+        }
+
+        return ipStr
     }
 
     fun str2ip(str: String) : Int {

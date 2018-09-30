@@ -7,16 +7,18 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.widget.CompoundButton
+import egpms.lol.wtf.egpms.data.EAction
 import kotlinx.android.synthetic.main.activity_control.*
 import kotlinx.android.synthetic.main.bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.android.UI
 
 class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    private val sockThread = newSingleThreadContext("sockThread")
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_add -> {
                 // Handle the camera action
@@ -36,7 +38,12 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         //initConfig("\tpms21\t176.107.123.100\t5000\tathlon")
         initConfig("\tpms21\t192.168.1.243\t5000\tathlon\t")
         disableBtns()
-        async { callGetState() }
+
+        launch(sockThread) {
+            val work = async { getStatus() }
+            val result = work.await()
+            launch(UI) { onStatusRecv(result) }
+        }
 
         btn_sock_one.setOnCheckedChangeListener {v,b -> handleClick(v,b) }
         btn_sock_two.setOnCheckedChangeListener{v,b -> handleClick(v,b) }
@@ -50,6 +57,8 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+
+        fab.setOnClickListener { startActivity(ProfileActivity.newIntent(this, EAction.PROFILE_ADD)) }
     }
 
     override fun onBackPressed() {
@@ -91,18 +100,13 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         }
 
         disableBtns()
-        async { callSetState(i) }
+        launch(sockThread) {
+            val work = async { setState(i) }
+            val result = work.await()
+            launch(UI) { onStatusRecv(result) }
+        }
     }
 
-    suspend fun callGetState() {
-        val res = getStatus()
-        onStatusRecv(res)
-    }
-
-    suspend fun callSetState(i: Int) {
-        val res = setState(i)
-        onStatusRecv(res)
-    }
     
     fun disableBtns() {
        control_panel.isEnabled = false
