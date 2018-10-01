@@ -10,12 +10,16 @@ import android.widget.ArrayAdapter
 import egpms.lol.wtf.egpms.data.EAction
 import egpms.lol.wtf.egpms.data.EProtocol
 import egpms.lol.wtf.egpms.data.Preferences
+import egpms.lol.wtf.egpms.data.Profile
 import kotlinx.android.synthetic.main.activity_profile.*
 
 class ProfileActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
 
     lateinit var prefs: Preferences
+    lateinit var protoAdapter: ArrayAdapter<EProtocol>
+
+    val LAST_PROFILE = "last_profile"
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,9 +28,10 @@ class ProfileActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
 
         edit_proto!!.onItemSelectedListener = this
 
-        val aa = ArrayAdapter(this, android.R.layout.simple_spinner_item, EProtocol.values())
-        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        edit_proto!!.adapter = aa
+
+        protoAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, EProtocol.values())
+        protoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        edit_proto!!.adapter = protoAdapter
 
         prefs = Preferences(this)
     }
@@ -45,67 +50,53 @@ class ProfileActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
         }
     }
 
-    /*
-    fun save() {
+    override fun onStop() {
+        super.onStop()
 
-        val arr = prefs!!.getString(PROFILES, "")
-        val profiles: ArrayList<Profile> = Gson().fromJson(arr)
+        if(!(edit_name.text.isEmpty() || !edit_address.text.isEmpty() || edit_port.text.isEmpty())) {
 
+            val key = edit_name.text.toString()
+            val proto = EProtocol.valueOf(edit_proto.selectedItem.toString())
+            val ip = str2ip(edit_address.text.toString())
+            val port = str2port(edit_port.text.toString())
+            val pass = edit_pass.text.toString()
 
-        edit_name.text
-        var pp: Profile? = null
-        for(prof in profiles) {
-            if(prof.name == edit_name.text.toString())
-            {
-                pp = prof
-                break
-            }
+            prefs.save(key, proto, ip, port, pass)
         }
 
-
-        //val pr
-
-
-        if(pp != null) {
-            pp.proto = EProtocol.valueOf(edit_proto.getSelectedItem().toString())
-            pp.ip = str2ip(edit_address.text.toString())
-            pp.port = str2port(edit_port.text.toString())
-            pp.pass = edit_pass.text.toString()
-        }
-        else {
-            /*
-            profiles!!.add(
-                    Profile(
-                            edit_name.text.toString(),
-                            EProtocol.valueOf(edit_proto.getSelectedItem().toString()),
-                            str2ip(edit_address.text.toString()),
-                            5000, "dfdf"))
-                            */
-        }
-
-
-
-        val ip: Int = 0
-
-        //profiles!!.add(Profile("ll_ll", EProtocol.PMS21, ip, 5000, "athlon"))
-
-      //  val editor = prefs!!.edit()
-        //editor.putString(PROFILES, gson.toJson(arr))
-       // editor.apply()
-
-
-//        SharedPreferences appSharedPrefs = PreferenceManager  .getDefaultSharedPreferences(context.getApplicationContext());
-//     SharedPreferences.Editor prefsEditor = appSharedPrefs.edit();
-//     Gson gson = new Gson();
-//     String json = gson.toJson(tasks); //tasks is an ArrayList instance variable
-//     prefsEditor.putString("currentTasks", json);
-//     prefsEditor.commit();
     }
-*/
 
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+
+        val key = edit_name.text.toString()
+        val proto = EProtocol.valueOf(edit_proto.selectedItem.toString())
+        val ip = str2ip(edit_address.text.toString())
+        val port = str2port(edit_port.text.toString())
+        val pass = edit_pass.text.toString()
+
+        outState?.putParcelable(LAST_PROFILE, Profile(key, proto, ip, port, pass))
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        val profile = savedInstanceState?.getParcelable<Profile>(LAST_PROFILE)
+
+        if(profile != null) {
+
+            edit_name.setText(profile.name)
+            edit_proto.setSelection(protoAdapter.getPosition(profile.proto))
+            edit_address.setText(ip2str(profile.ip))
+            edit_port.setText(profile.port)
+            edit_pass.setText(profile.pass)
+
+        }
+
+    }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {
-
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {

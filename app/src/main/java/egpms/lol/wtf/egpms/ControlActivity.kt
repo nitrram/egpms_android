@@ -5,9 +5,11 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.CompoundButton
 import egpms.lol.wtf.egpms.data.EAction
+import egpms.lol.wtf.egpms.data.Preferences
 import kotlinx.android.synthetic.main.activity_control.*
 import kotlinx.android.synthetic.main.bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -34,6 +36,14 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_control)
         setSupportActionBar(toolbar)
+
+
+        val prefs = Preferences(this)
+
+        var i = 0
+        for(a in prefs.getAll())
+            nav_view.menu.add(0,i++,0, a.name)
+
 
         //initConfig("\tpms21\t176.107.123.100\t5000\tathlon")
         initConfig("\tpms21\t192.168.1.243\t5000\tathlon\t")

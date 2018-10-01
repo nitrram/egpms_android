@@ -57,4 +57,13 @@ class Preferences(context: Context) {
         return pp
     }
 
+
+    fun getAll() : ArrayList<Profile> {
+        val arr = prefs!!.getString(PROFILES, "")
+        if(arr.isEmpty()) {
+            return ArrayList()
+        }
+
+        return Gson().fromJson(arr)
+    }
 }
