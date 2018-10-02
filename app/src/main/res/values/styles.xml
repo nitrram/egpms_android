@@ -17,4 +17,12 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="EditItem">
+        <item name="android:layout_marginStart">@dimen/edit_item_marginStart</item>
+        <item name="android:layout_marginEnd">@dimen/edit_item_marginEnd</item>
+        <item name="android:layout_marginBottom">@dimen/edit_item_marginBottom</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
 </resources>

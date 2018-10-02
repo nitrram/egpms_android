@@ -6,4 +6,11 @@
     <dimen name="act_margin">16dp</dimen>
     <dimen name="drawer_title_space">5dp</dimen>
     <dimen name="drawer_header_height">176dp</dimen>
+
+    <dimen name="edit_item_marginStart">16dp</dimen>
+    <dimen name="edit_item_marginEnd">48dp</dimen>
+    <dimen name="edit_item_marginTop">25dp</dimen>
+    <dimen name="edit_item_marginBottom">16dp</dimen>
+
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

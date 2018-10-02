@@ -15,23 +15,35 @@
 
 
 // TODO Config will be created based upon app's input
-static Config createDummyConfig();
+static Config createDummyConfig(const std::string &s);
 
 static Action commandToAction(jint command, size_t idx);
 
 static jint convertState(Status st);
 
-jint mm_getStatus(
+static std::string _config_line;
+
+void mm_initConfig(
         JNIEnv *env,
+        jobject  */*this*/,
+        jstring config_line
+) {
+    const char *cstr = env->GetStringUTFChars(config_line, NULL);
+    _config_line = {cstr};
+    env->ReleaseStringUTFChars(config_line, cstr);
+}
+
+jint mm_getStatus(
+        JNIEnv */* env */,
         jobject /* this */) {
 
     int sock;
     Session sess;
 
 
-    Config conf = createDummyConfig();
+    Config conf = createDummyConfig(_config_line);
     sock = create_socket(&conf.addr);
-        establish_connection(sock);
+    establish_connection(sock);
     sess = authorize(sock, conf.key);
     Status stat = recv_status(sock, sess, conf.proto);
 
@@ -39,17 +51,16 @@ jint mm_getStatus(
     close_session(sock);
     close(sock);
 
-
     return result;
 }
 
 jint mm_setState(
-        JNIEnv *env,
+        JNIEnv */* env */,
         jobject /* this */,
         jint abcd) {
 
     int sock;
-    Config conf = createDummyConfig();
+    Config conf = createDummyConfig(_config_line);
     Session sess;
 
     sock = create_socket(&conf.addr);
@@ -84,6 +95,7 @@ jint mm_setState(
 }
 
 static JNINativeMethod method_table[] = {
+        { "initConfig", "(Ljava/lang/String;)V", reinterpret_cast<void*>(&mm_initConfig)},
         { "getStatus", "()I", reinterpret_cast<void*>(&mm_getStatus)},
         { "setState", "(I)I", reinterpret_cast<void*>(&mm_setState)}
 };
@@ -96,8 +108,10 @@ jint JNI_OnLoad(JavaVM *vm, void * /* reserved */) {
 }
 
 /********************************** private utils */
-Config createDummyConfig() {
-    std::string s = "\tpms21\t192.168.1.24\t8000\tpikach";
+Config createDummyConfig(const std::string &s) {
+
+
+    LOGI("dummy config: %s", s.c_str());
 
     char *line = new char[s.size() + 1];
     std::copy(s.begin(), s.end(), line);
@@ -112,6 +126,8 @@ Config createDummyConfig() {
     conf.addr.sin_family = AF_INET;
 
     delete line;
+
+    LOGI("dummy line consumed");
 
     return conf;
 }
@@ -154,6 +170,8 @@ jint convertState(Status stat) {
                 break;
         }
     }
+
+    LOGI("result %d", result);
     return result;
 }
 
