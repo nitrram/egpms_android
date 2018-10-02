@@ -44,9 +44,6 @@
             android:layout_margin="25dp"
             android:text="@string/btn_4"/>
 
-
-
     </LinearLayout>
-
 
 </android.support.constraint.ConstraintLayout>
