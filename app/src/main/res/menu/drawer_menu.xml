@@ -3,11 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-        <item
+  <group android:id="@+id/menu_group"
+      android:checkableBehavior="single">
+  <!--      <item
             android:id="@+id/nav_add"
             android:icon="@android:drawable/ic_input_add"
-            android:title="@string/action_add_config" />
+            android:title="@string/action_add_config" />-->
     </group>
 
 </menu>

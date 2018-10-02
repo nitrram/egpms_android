@@ -9,6 +9,7 @@ class Preferences(context: Context) {
 
     val PREFS_FILENAME = "egpms.lol.wtf.egpms.prefs"
     val PROFILES = "profiles"
+    val LAST_PROFILE = "last_profile"
     var prefs: SharedPreferences? = null
 
     init {
@@ -19,8 +20,7 @@ class Preferences(context: Context) {
 
     fun save(key: String, proto: EProtocol, ip: Int, port: Int, pass: String) {
 
-        val arr = prefs!!.getString(PROFILES, "")
-        val profiles: ArrayList<Profile> = Gson().fromJson(arr)
+        val profiles = ArrayList<Profile>()
 
         var pp: Profile? = get(key)
 
@@ -31,32 +31,50 @@ class Preferences(context: Context) {
             pp.pass = pass
         }
         else {
-            profiles.add(
-                    Profile(key, proto, ip, port, pass)
-            )
+            pp = Profile(key, proto, ip, port, pass)
         }
 
+        profiles.add(pp)
+
+        val oldProfs: ArrayList<Profile> = getAll()
+        for(p in oldProfs) {
+            if(p.name != pp.name) {
+                profiles.add(p)
+            }
+        }
+
+        /* replace json string any way */
         val editor = prefs!!.edit()
-        editor.putString(PROFILES, Gson().toJson(arr))
+        editor.putString(PROFILES, Gson().toJson(profiles))
+        editor.apply()
+    }
+
+    fun delete(key: String) {
+        val profs = getAll().filter{ it.name != key }
+
+        /* replace json string any way */
+        val editor = prefs!!.edit()
+        editor.putString(PROFILES, Gson().toJson(profs))
         editor.apply()
     }
 
     fun get(key: String) : Profile? {
-        val arr = prefs!!.getString(PROFILES, "")
-        val profiles: ArrayList<Profile> = Gson().fromJson(arr)
-
         var pp: Profile? = null
-        for(prof in profiles) {
-            if(prof.name == key)
-            {
-                pp = prof
-                break
+        val arr = prefs!!.getString(PROFILES, "")
+        if(!arr.isEmpty()) {
+            val profiles: ArrayList<Profile> = Gson().fromJson(arr)
+
+
+            for (prof in profiles) {
+                if (prof.name == key) {
+                    pp = prof
+                    break
+                }
             }
         }
 
         return pp
     }
-
 
     fun getAll() : ArrayList<Profile> {
         val arr = prefs!!.getString(PROFILES, "")
@@ -65,5 +83,17 @@ class Preferences(context: Context) {
         }
 
         return Gson().fromJson(arr)
+    }
+
+    fun selectProfile(key: String) {
+        val editor = prefs!!.edit()
+        editor.putString(LAST_PROFILE, key)
+        editor.apply()
+    }
+
+    fun getLast(): Profile? {
+        val lastProfile = prefs!!.getString(LAST_PROFILE, "")
+
+        return get(lastProfile)
     }
 }

@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.widget.CompoundButton
 import egpms.lol.wtf.egpms.data.EAction
 import egpms.lol.wtf.egpms.data.Preferences
+import egpms.lol.wtf.egpms.data.Profile
 import kotlinx.android.synthetic.main.activity_control.*
 import kotlinx.android.synthetic.main.bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -20,13 +21,15 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
 
     private val sockThread = newSingleThreadContext("sockThread")
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_add -> {
-                // Handle the camera action
+    private lateinit var prefs: Preferences
 
-            }
-        }
+    private var lastProfile: Profile? = null
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
+        prefs.selectProfile(item.title.toString())
+
+        updateProfiles()
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
@@ -37,23 +40,7 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         setContentView(R.layout.activity_control)
         setSupportActionBar(toolbar)
 
-
-        val prefs = Preferences(this)
-
-        var i = 0
-        for(a in prefs.getAll())
-            nav_view.menu.add(0,i++,0, a.name)
-
-
-        //initConfig("\tpms21\t176.107.123.100\t5000\tathlon")
-        initConfig("\tpms21\t192.168.1.243\t5000\tathlon\t")
-        disableBtns()
-
-        launch(sockThread) {
-            val work = async { getStatus() }
-            val result = work.await()
-            launch(UI) { onStatusRecv(result) }
-        }
+        prefs = Preferences(this)
 
         btn_sock_one.setOnCheckedChangeListener {v,b -> handleClick(v,b) }
         btn_sock_two.setOnCheckedChangeListener{v,b -> handleClick(v,b) }
@@ -69,6 +56,14 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         nav_view.setNavigationItemSelectedListener(this)
 
         fab.setOnClickListener { startActivity(ProfileActivity.newIntent(this, EAction.PROFILE_ADD)) }
+
+        fab.setOnLongClickListener { deleteProfile() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        updateProfiles()
     }
 
     override fun onBackPressed() {
@@ -79,7 +74,7 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         }
     }
 
-    fun updateSwitches(i: Int) {
+    private fun updateSwitches(i: Int) {
         // 1
         btn_sock_one.isChecked = ((i and 0xff) == 0xff)
 
@@ -93,8 +88,57 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
         btn_sock_four.isChecked = (((i shr 24) and 0xff) == 0xff)
     }
 
+    private fun deleteProfile() : Boolean {
+        if(lastProfile != null) {
+            prefs.delete(lastProfile!!.name)
 
-    fun handleClick(v : CompoundButton, b: Boolean) {
+            updateProfiles()
+        }
+
+        return true
+    }
+
+    private fun updateProfiles() {
+
+        nav_view.menu.clear()
+
+        var i = 0
+        var lp: Profile? = null
+        for(a in prefs.getAll()) {
+            lp = a
+            nav_view.menu.add(R.id.menu_group, i++, 0, a.name)
+        }
+
+        if(i == 1) {
+            prefs.selectProfile(lp!!.name)
+        }
+
+        disableBtns()
+
+        lastProfile = prefs.getLast()
+        if(lastProfile != null) {
+
+            for(a in 0..(i-1)) {
+                if(nav_view.menu.getItem(a).title == lastProfile!!.name) {
+                    nav_view.menu.getItem(a).isChecked = true
+                }
+            }
+
+            //initConfig("\tpms21\t176.107.123.100\t5000\tathlon")
+           // initConfig("\tpms21\t192.168.1.243\t5000\tathlon\t")
+            initConfig(lastProfile!!.toProfileString())
+
+
+            launch(sockThread) {
+                val work = async { getStatus() }
+                val result = work.await()
+                launch(UI) { onStatusRecv(result) }
+            }
+        }
+    }
+
+
+    private fun handleClick(v : CompoundButton, b: Boolean) {
         var i :Int
 
         if(b)
@@ -118,11 +162,11 @@ class ControlActivity : AppCompatActivity(), NavigationView.OnNavigationItemSele
     }
 
     
-    fun disableBtns() {
+    private fun disableBtns() {
        control_panel.isEnabled = false
     }
 
-    fun onStatusRecv(value: Int) {
+    private fun onStatusRecv(value: Int) {
         control_panel.isEnabled = true
 
         updateSwitches(value)

@@ -53,7 +53,7 @@ class ProfileActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener 
     override fun onStop() {
         super.onStop()
 
-        if(!(edit_name.text.isEmpty() || !edit_address.text.isEmpty() || edit_port.text.isEmpty())) {
+        if(!(edit_name.text.isEmpty() || edit_address.text.isEmpty() || edit_port.text.isEmpty())) {
 
             val key = edit_name.text.toString()
             val proto = EProtocol.valueOf(edit_proto.selectedItem.toString())
